@@ -3,6 +3,14 @@ Yet another WebComponent builder...
 Featuring typescript, decorators and JSX
 Thanks [awesome Javascript project names generator](https://mrsharpoblunto.github.io/foswig.js/) for that stunning name!
 
+## features
+ - Declare custom elements using the `@component` decorator
+ - Refresh the DOM when property decorated with `@state` changes
+ - Listen to dom events using `eventListener` decorator
+ - Watch attribute changes using `attributeListener` decorator
+ - Render the UI using `JSX` via the `render` method
+ - Uses virtual dom diff/patching to smartly apply changes to the UI
+
 ## installation
 First you need to clone the repository, then use `yarn install` to install all dependencies.
 
