@@ -1,0 +1,26 @@
+{
+	"name": "hellow-js",
+	"version": "1.0.0",
+	"description": "Yet another WebComponent builder...",
+	"main": "./lib/index.js",
+	"types": "./lib/index.d.ts",
+	"scripts": {
+		"start": "./node_modules/.bin/tsc -w -p ./tsconfig.json",
+		"build": "./node_modules/.bin/tsc -p ./tsconfig.json",
+		"demo": "./node_modules/.bin/browserify demo/**/*.tsx -p [ tsify ] > demo/build/demo.js"
+	},
+	"author": "Benjamin Santalucia",
+	"license": "ISC",
+	"dependencies": {},
+	"devDependencies": {
+		"browserify": "^15.2.0",
+		"document-register-element": "^1.7.2",
+		"tsify": "^3.0.4",
+		"tslib": "^1.9.0",
+		"tslint": "^5.9.1",
+		"tslint-eslint-rules": "^4.1.1",
+		"tslint-language-service": "^0.9.8",
+		"tslint-microsoft-contrib": "^5.0.2",
+		"typescript": "^2.6.2"
+	}
+}

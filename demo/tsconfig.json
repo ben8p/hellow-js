@@ -1,0 +1,10 @@
+{
+	"extends": "../tsconfig-base",
+	"compilerOptions": {
+	},
+	"include": [
+		"**/*.tsx",
+		"../src/**/*.tsx",
+		"../src/**/*.ts",
+	]
+}
