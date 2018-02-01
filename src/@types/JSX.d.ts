@@ -4,7 +4,7 @@ declare global {
 	namespace JSX {
 		interface Element {
 			type: string;
-			props: {[key: string]: string};
+			attributes: {[key: string]: string};
 			children: Element[];
 		}
 		interface ElementClass {

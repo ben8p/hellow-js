@@ -9,12 +9,17 @@ interface IConstructable {
 interface ICustomElementConstructor extends Function {
 	observedAttributes?: string[];
 }
-interface ICustomElement extends HTMLElement {
+interface ICustomElement extends JSX.ElementClass {
 	constructor: ICustomElementConstructor; // tslint:disable-line:no-reserved-keywords
 	connectedCallback?(): void;
 	attributeChangedCallback?(name: string, oldValue: string, newValue: string): void;
 }
 type DecoratorFactory = (targetPrototype: ICustomElement, propertyKey: string) => void;
+
+function getMessagingHub(targetClass: any): DocumentFragment {
+	targetClass.__messagingHub = targetClass.__messagingHub || document.createDocumentFragment();
+	return targetClass.__messagingHub;
+}
 
 export function component(name: string): (targetClass: IConstructable) => void {
 	return function(targetClass: IConstructable): void {
@@ -25,12 +30,23 @@ export function component(name: string): (targetClass: IConstructable) => void {
 				return undefined;
 			}
 			const template = originalRender.apply(this);
-			render(this, template, previousTemplate);
+			const worker = render(this, template, previousTemplate);
+			if (worker) {
+				const workerListener = (message: MessageEvent) => {
+					if (message.data.action === 'done') {
+						worker.removeEventListener('message', workerListener);
+						getMessagingHub(this).dispatchEvent(new CustomEvent('doneRendering'));
+					}
+				};
+				worker.addEventListener('message', workerListener);
+			} else {
+				getMessagingHub(this).dispatchEvent(new CustomEvent('doneRendering'));
+			}
 			previousTemplate = template;
 			return template;
 		};
 
-		targetClass.prototype._renderState = function(): void {
+		targetClass.prototype.__renderState = function(): void {
 			if (!previousTemplate) { return; }
 			this.render();
 		};
@@ -56,21 +72,32 @@ export function state(): DecoratorFactory {
 			},
 			set(newValue: any): void { // tslint:disable-line:no-reserved-keywords
 				value = newValue;
-				this._renderState();
+				this.__renderState();
 			},
 		});
 	};
 }
 
-export function eventListener(eventName: string): DecoratorFactory {
+export function eventListener(eventSelector: string): DecoratorFactory {
 	return function(targetPrototype: ICustomElement, propertyKey: string): void {
-		// tslint:disable-next-line:no-unbound-method
-		const original = targetPrototype.connectedCallback;
+		const original = targetPrototype.connectedCallback; // tslint:disable-line:no-unbound-method
 		targetPrototype.connectedCallback = function(): void {
 			if (original) {
 				original.apply(this);
 			}
-			this.addEventListener(eventName, this[propertyKey].bind(this));
+
+
+			const eventParts: string[] = eventSelector.split(':');
+			const eventName: string = eventParts.pop();
+			const handler = this[propertyKey].bind(this);
+
+			this.addEventListener(eventName, (event: Event) => {
+				const cssSelector: string = eventParts[0];
+				const matches = (cssSelector && (event.target as Element).matches(cssSelector)) || true;
+				if (matches) {
+					handler(event);
+				}
+			});
 		};
 	};
 }
@@ -86,6 +113,27 @@ export function attributeListener(attributeName: string): DecoratorFactory {
 			if (oldValue !== newValue && name === attributeName) {
 				this[propertyKey].apply(this, [newValue, oldValue]);
 			}
+		};
+	};
+}
+
+export function domNode(cssSelector: string): DecoratorFactory {
+	return function(targetPrototype: ICustomElement, propertyKey: string): void {
+		const original = targetPrototype.render; // tslint:disable-line:no-unbound-method
+		targetPrototype.render = function(): void {
+
+			const doneRenderingListener = () => {
+				getMessagingHub(this).removeEventListener('doneRendering', doneRenderingListener);
+				this[propertyKey] = this.querySelector(cssSelector);
+			};
+			getMessagingHub(this).addEventListener('doneRendering', doneRenderingListener);
+
+			let value;
+			if (original) {
+				value = original.apply(this);
+			}
+			this[propertyKey] = this.querySelector(cssSelector);
+			return value;
 		};
 	};
 }
