@@ -35,7 +35,7 @@ function attributesHaveChanged(node1: JSX.Element, node2: JSX.Element): boolean 
 const canUseWorker = 'Worker' in window && 'Blob' in window && 'URL' in window;
 let worker: Worker;
 
-export function render(parentNode: Node, currentVirtualNode: JSX.Element, previousVirtualNode: JSX.Element): Worker {
+export function render(parentNode: Node, currentVirtualNode: JSX.Element, previousVirtualNode: JSX.Element, useWorker: boolean = true): Worker {
 	const postMessage = (data: {[key: string]: any}, _transferList?: any) => {
 		let node: Node = parentNode;
 		if (data.path.length > 0) {
@@ -106,7 +106,7 @@ export function render(parentNode: Node, currentVirtualNode: JSX.Element, previo
 		});
 	}
 
-	if (canUseWorker) {
+	if (useWorker && canUseWorker) {
 		if (!worker) {
 			const blob = new Blob([`
 				${nodeHasChanged.toString()}

@@ -12,6 +12,7 @@ Thanks [awesome Javascript project names generator](https://mrsharpoblunto.githu
  - Render the UI using `JSX` via the `render` method
  - Uses virtual dom diff/patching to smartly apply changes to the UI
  - Virtual Dom diff/patching via Web Worker (when available)
+ - Web Worker can explicitly be disbaled via the `@component` decorator : `@component('my-component', {useWorker: false})`
 
 ## component example
 ```ts

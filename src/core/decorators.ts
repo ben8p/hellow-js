@@ -24,6 +24,10 @@ function getMessagingHub(targetClass: ICustomElement): DocumentFragment {
 	return targetClass.__messagingHub__;
 }
 
+interface IComponentOptions {
+	useWorker?: boolean;
+}
+
 const EVENTS = {
 	DONE_RENDERING: 'doneRendering',
 };
@@ -35,7 +39,7 @@ function addEventListenerOnce(targetClass: ICustomElement, eventName: string, li
 	getMessagingHub(targetClass).addEventListener(eventName, doneRenderingListener);
 }
 
-export function component(name: string): (targetClass: IConstructable) => void {
+export function component(name: string, options: IComponentOptions = {}): (targetClass: IConstructable) => void {
 	return function(targetClass: IConstructable): void {
 		let previousTemplate: JSX.Element = null;
 		const originalRender = targetClass.prototype.render;
@@ -44,7 +48,7 @@ export function component(name: string): (targetClass: IConstructable) => void {
 				return undefined;
 			}
 			const template = originalRender.apply(this);
-			const worker = render(this, template, previousTemplate);
+			const worker = render(this, template, previousTemplate, options.useWorker !== false);
 			if (worker) {
 				const workerListener = (message: MessageEvent) => {
 					if (message.data.action === 'done') {
