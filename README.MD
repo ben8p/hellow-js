@@ -1,7 +1,9 @@
 # Hellow-JS
+![Hellow-JS][logo]
 Yet another WebComponent builder...  
 Featuring typescript, decorators and JSX  
 Thanks [awesome Javascript project names generator](https://mrsharpoblunto.github.io/foswig.js/) for that stunning name!  
+Thanks [squarespace](https://logo.squarespace.com) for that outstanding logo!  
 
 ## features
  - Declare custom elements using the `@component` decorator
@@ -54,3 +56,6 @@ Run `yarn dev-lib` (or `npm run dev-lib`) to make an initial build of the librar
 Run `yarn build-demo` (or `npm run build-demo`) to make a one shot build of the demos  
 Run `yarn dev-demo` (or `npm run dev-demo`) to make an initial build of the demos and keep watching for file changes.  
 Then open the file `./demo/index.html` into a browser (using `file://` protocol)  
+
+
+[logo]: https://raw.githubusercontent.com/ben8p/hellow-js/master/Hellow-JS.png "Hellow-JS"
