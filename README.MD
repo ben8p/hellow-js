@@ -1,5 +1,5 @@
 # Hellow-JS
-![Hellow-JS][logo]
+![Hellow-JS][logo]  
 Yet another WebComponent builder...  
 Featuring typescript, decorators and JSX  
 Thanks [awesome Javascript project names generator](https://mrsharpoblunto.github.io/foswig.js/) for that stunning name!  
