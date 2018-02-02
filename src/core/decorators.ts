@@ -2,6 +2,7 @@
 
 import 'document-register-element'; // tslint:disable-line:no-import-side-effect
 import { render } from './tsx';
+import { debounce } from './debounce';
 
 interface IConstructable {
 	new(): any;
@@ -10,13 +11,15 @@ interface ICustomElementConstructor extends Function {
 	observedAttributes?: string[];
 }
 interface ICustomElement extends JSX.ElementClass {
+	__state__?: boolean;
+	__messagingHub__?: DocumentFragment;
 	constructor: ICustomElementConstructor; // tslint:disable-line:no-reserved-keywords
 	connectedCallback?(): void;
 	attributeChangedCallback?(name: string, oldValue: string, newValue: string): void;
 }
 type DecoratorFactory = (targetPrototype: ICustomElement, propertyKey: string) => void;
 
-function getMessagingHub(targetClass: any): DocumentFragment {
+function getMessagingHub(targetClass: ICustomElement): DocumentFragment {
 	targetClass.__messagingHub__ = targetClass.__messagingHub__ || document.createDocumentFragment();
 	return targetClass.__messagingHub__;
 }
@@ -24,7 +27,7 @@ function getMessagingHub(targetClass: any): DocumentFragment {
 const EVENTS = {
 	DONE_RENDERING: 'doneRendering',
 };
-function addEventListenerOnce(targetClass: any, eventName: string, listener: (event: Event) => void): void {
+function addEventListenerOnce(targetClass: ICustomElement, eventName: string, listener: (event: Event) => void): void {
 	const doneRenderingListener = (event: Event) => {
 		getMessagingHub(targetClass).removeEventListener(eventName, doneRenderingListener);
 		listener.apply(targetClass, [event]);
@@ -71,21 +74,24 @@ export function component(name: string): (targetClass: IConstructable) => void {
 
 export function state(): DecoratorFactory {
 	return function(targetPrototype: ICustomElement, propertyKey: string): void {
-		let renderedOnce = false;
-		const original = targetPrototype.render; // tslint:disable-line:no-unbound-method
-		targetPrototype.render = function(): void {
-			if (!renderedOnce) {
-				addEventListenerOnce(this, EVENTS.DONE_RENDERING, () => {
-					renderedOnce = true;
-				});
-			}
+		let debounceRender: Function;
+		if (!targetPrototype.__state__) {
+			const original = targetPrototype.render; // tslint:disable-line:no-unbound-method
+			targetPrototype.render = function(): void {
+				if (!debounceRender) {
+					addEventListenerOnce(this, EVENTS.DONE_RENDERING, () => {
+						debounceRender = debounce(this.render.bind(this));
+					});
+				}
 
-			let renderValue;
-			if (original) {
-				renderValue = original.apply(this);
-			}
-			return renderValue;
-		};
+				let renderValue;
+				if (original) {
+					renderValue = original.apply(this);
+				}
+				return renderValue;
+			};
+			targetPrototype.__state__ = true;
+		}
 
 
 		let value: any = null;
@@ -95,8 +101,8 @@ export function state(): DecoratorFactory {
 			},
 			set(newValue: any): void { // tslint:disable-line:no-reserved-keywords
 				value = newValue;
-				if (renderedOnce) {
-					this.render();
+				if (debounceRender) {
+					debounceRender();
 				}
 			},
 		});

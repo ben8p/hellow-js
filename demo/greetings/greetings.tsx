@@ -7,10 +7,11 @@ export class MyGreetings extends HTMLElement implements JSX.ElementClass {
 	@state() // any change to this property will re-render
 	private userName: string = 'Mr. Nobody';
 
+	@state() // any change to this property will re-render
+	private keyUpCount: number = 0;
+
 	@domNode('[data-node=inputNode]') // this will attach the node matching the css selector to the class member
 	private inputNode: HTMLInputElement;
-
-	private keyUpCount: number = 0;
 
 	public render(): JSX.Element {
 		return (<div>
