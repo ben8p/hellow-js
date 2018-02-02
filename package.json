@@ -5,9 +5,10 @@
 	"main": "./lib/index.js",
 	"types": "./lib/index.d.ts",
 	"scripts": {
-		"start": "./node_modules/.bin/tsc -w -p ./tsconfig.json",
-		"build": "./node_modules/.bin/tsc -p ./tsconfig.json",
-		"demo": "./node_modules/.bin/browserify demo/**/*.tsx -p [ tsify ] > demo/build/demo.js"
+		"build-lib": "./node_modules/.bin/tsc -p ./tsconfig.json",
+		"build-demo": "./node_modules/.bin/browserify demo/**/*.tsx -p [ tsify ] -o demo/build/demo.js",
+		"dev-lib": "./node_modules/.bin/tsc -p ./tsconfig.json -w",
+		"dev-demo": "./node_modules/.bin/watchify demo/**/*.tsx -p [ tsify ] -o demo/build/demo.js -v"
 	},
 	"author": "Benjamin Santalucia",
 	"license": "ISC",
@@ -21,6 +22,7 @@
 		"tslint-eslint-rules": "^4.1.1",
 		"tslint-language-service": "^0.9.8",
 		"tslint-microsoft-contrib": "^5.0.2",
-		"typescript": "^2.6.2"
+		"typescript": "^2.6.2",
+		"watchify": "^3.10.0"
 	}
 }

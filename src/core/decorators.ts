@@ -17,8 +17,19 @@ interface ICustomElement extends JSX.ElementClass {
 type DecoratorFactory = (targetPrototype: ICustomElement, propertyKey: string) => void;
 
 function getMessagingHub(targetClass: any): DocumentFragment {
-	targetClass.__messagingHub = targetClass.__messagingHub || document.createDocumentFragment();
-	return targetClass.__messagingHub;
+	targetClass.__messagingHub__ = targetClass.__messagingHub__ || document.createDocumentFragment();
+	return targetClass.__messagingHub__;
+}
+
+const EVENTS = {
+	DONE_RENDERING: 'doneRendering',
+};
+function addEventListenerOnce(targetClass: any, eventName: string, listener: (event: Event) => void): void {
+	const doneRenderingListener = (event: Event) => {
+		getMessagingHub(targetClass).removeEventListener(eventName, doneRenderingListener);
+		listener.apply(targetClass, [event]);
+	};
+	getMessagingHub(targetClass).addEventListener(eventName, doneRenderingListener);
 }
 
 export function component(name: string): (targetClass: IConstructable) => void {
@@ -35,20 +46,15 @@ export function component(name: string): (targetClass: IConstructable) => void {
 				const workerListener = (message: MessageEvent) => {
 					if (message.data.action === 'done') {
 						worker.removeEventListener('message', workerListener);
-						getMessagingHub(this).dispatchEvent(new CustomEvent('doneRendering'));
+						getMessagingHub(this).dispatchEvent(new CustomEvent(EVENTS.DONE_RENDERING));
 					}
 				};
 				worker.addEventListener('message', workerListener);
 			} else {
-				getMessagingHub(this).dispatchEvent(new CustomEvent('doneRendering'));
+				getMessagingHub(this).dispatchEvent(new CustomEvent(EVENTS.DONE_RENDERING));
 			}
 			previousTemplate = template;
 			return template;
-		};
-
-		targetClass.prototype.__renderState = function(): void {
-			if (!previousTemplate) { return; }
-			this.render();
 		};
 
 		const original = targetClass.prototype.connectedCallback;
@@ -65,6 +71,23 @@ export function component(name: string): (targetClass: IConstructable) => void {
 
 export function state(): DecoratorFactory {
 	return function(targetPrototype: ICustomElement, propertyKey: string): void {
+		let renderedOnce = false;
+		const original = targetPrototype.render; // tslint:disable-line:no-unbound-method
+		targetPrototype.render = function(): void {
+			if (!renderedOnce) {
+				addEventListenerOnce(this, EVENTS.DONE_RENDERING, () => {
+					renderedOnce = true;
+				});
+			}
+
+			let renderValue;
+			if (original) {
+				renderValue = original.apply(this);
+			}
+			return renderValue;
+		};
+
+
 		let value: any = null;
 		Object.defineProperty(targetPrototype, propertyKey, {
 			get(): any { // tslint:disable-line:no-reserved-keywords
@@ -72,7 +95,9 @@ export function state(): DecoratorFactory {
 			},
 			set(newValue: any): void { // tslint:disable-line:no-reserved-keywords
 				value = newValue;
-				this.__renderState();
+				if (renderedOnce) {
+					this.render();
+				}
 			},
 		});
 	};
@@ -85,7 +110,6 @@ export function eventListener(eventSelector: string): DecoratorFactory {
 			if (original) {
 				original.apply(this);
 			}
-
 
 			const eventParts: string[] = eventSelector.split(':');
 			const eventName: string = eventParts.pop();
@@ -121,18 +145,14 @@ export function domNode(cssSelector: string): DecoratorFactory {
 	return function(targetPrototype: ICustomElement, propertyKey: string): void {
 		const original = targetPrototype.render; // tslint:disable-line:no-unbound-method
 		targetPrototype.render = function(): void {
-
-			const doneRenderingListener = () => {
-				getMessagingHub(this).removeEventListener('doneRendering', doneRenderingListener);
+			addEventListenerOnce(this, EVENTS.DONE_RENDERING, () => {
 				this[propertyKey] = this.querySelector(cssSelector);
-			};
-			getMessagingHub(this).addEventListener('doneRendering', doneRenderingListener);
+			});
 
 			let value;
 			if (original) {
 				value = original.apply(this);
 			}
-			this[propertyKey] = this.querySelector(cssSelector);
 			return value;
 		};
 	};
