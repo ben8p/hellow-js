@@ -3,6 +3,8 @@ import { domNode } from '../../src/core/decorators';
 
 @component('my-greetings', {
 	style: {
+		border: '2px solid #eee',
+		display: 'block',
 		h1: {
 			color: 'green',
 			span: {
