@@ -15,10 +15,25 @@ Thanks [squarespace](https://logo.squarespace.com) for that outstanding logo!
  - Uses virtual dom diff/patching to smartly apply changes to the UI
  - Virtual Dom diff/patching via Web Worker (when available)
  - Web Worker can explicitly be disbaled via the `@component` decorator : `@component('my-component', {useWorker: false})`
+ - Support for extending native elements via the `@component` decorator : `@component('my-component', {extends: 'div'})`
+ - Support custom element styling via the `@component` decorator : `@component('my-component', {style: {div: { background: 'red' }}})`
 
 ## component example
 ```ts
-@component('my-greetings') // this adds the component to the CustomElementRegistry
+@component('my-greetings', {
+	style: {
+		h1: {
+			color: 'green',
+			span: {
+				'font-style': 'italic',
+			},
+		},
+		label: {
+			'font-weight': 'bold',
+			margin: '0 15px 0 0',
+		},
+	},
+}) // this adds the component to the CustomElementRegistry
 export class MyGreetings extends HTMLElement implements JSX.ElementClass {
 
 	@state() // any change to this property will re-render

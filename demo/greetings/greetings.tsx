@@ -1,7 +1,20 @@
 import { component, eventListener, state, tsx } from '../../lib';
 import { domNode } from '../../src/core/decorators';
 
-@component('my-greetings') // this adds the component to the CustomElementRegistry
+@component('my-greetings', {
+	style: {
+		h1: {
+			color: 'green',
+			span: {
+				'font-style': 'italic',
+			},
+		},
+		label: {
+			'font-weight': 'bold',
+			margin: '0 15px 0 0',
+		},
+	},
+}) // this adds the component to the CustomElementRegistry
 export class MyGreetings extends HTMLElement implements JSX.ElementClass {
 
 	@state() // any change to this property will re-render

@@ -3,6 +3,7 @@
 import 'document-register-element'; // tslint:disable-line:no-import-side-effect
 import { render } from './tsx';
 import { debounce } from './debounce';
+import { parse, ITSS } from './tss';
 
 interface IConstructable {
 	new(): any;
@@ -25,7 +26,9 @@ function getMessagingHub(targetClass: ICustomElement): DocumentFragment {
 }
 
 interface IComponentOptions {
+	extends?: string; // tslint:disable-line:no-reserved-keywords
 	useWorker?: boolean;
+	style?: ITSS;
 }
 
 const EVENTS = {
@@ -72,7 +75,27 @@ export function component(name: string, options: IComponentOptions = {}): (targe
 			}
 		};
 
-		customElements.define(name, targetClass);
+		let defineOptions: ElementDefinitionOptions;
+		if (options.extends) {
+			defineOptions = {
+				extends: options.extends,
+			};
+		}
+
+		customElements.define(name, targetClass, defineOptions);
+
+		if (options.style) {
+			const namespace: ITSS = {};
+			namespace[name] = options.style;
+			const css = parse(namespace);
+			const cssBlob = new Blob([css], {type : 'text/css'});
+			const cssURL = URL.createObjectURL(cssBlob);
+			const link = document.createElement('link');
+			link.setAttribute('rel', 'stylesheet');
+			link.setAttribute('type', 'text/css');
+			link.setAttribute('href', cssURL);
+			document.querySelector('head').appendChild(link);
+		}
 	};
 }
 
