@@ -1,5 +1,4 @@
-import { component, eventListener, state, tsx } from '../../lib';
-import { domNode } from '../../src/core/decorators';
+import { domNode, component, eventListener, state, tsx } from '../../lib';
 
 @component('my-greetings', {
 	style: {
@@ -18,7 +17,6 @@ import { domNode } from '../../src/core/decorators';
 	},
 }) // this adds the component to the CustomElementRegistry
 export class MyGreetings extends HTMLElement implements JSX.ElementClass {
-
 	@state() // any change to this property will re-render
 	private userName: string = 'Mr. Nobody';
 

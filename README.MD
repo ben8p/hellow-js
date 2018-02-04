@@ -15,6 +15,8 @@ Thanks [squarespace](https://logo.squarespace.com) for that outstanding logo!
  - Uses virtual dom diff/patching to smartly apply changes to the UI
  - Virtual Dom diff/patching via Web Worker (when available)
  - Web Worker can explicitly be disbaled via the `@component` decorator : `@component('my-component', {useWorker: false})`
+ - Uses Shadow DOM (when available)
+ - Shadow DOM can explicitly be disbaled via the `@component` decorator : `@component('my-component', {useShadowDom: false})`
  - Support for extending native elements via the `@component` decorator : `@component('my-component', {extends: 'div'})`
  - Support custom element styling via the `@component` decorator : `@component('my-component', {style: {div: { background: 'red' }}})`
 
