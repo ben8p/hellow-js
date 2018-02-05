@@ -1,5 +1,5 @@
 export interface ITSS {
-	[key: string]: CSS.CSSProperties | ITSS;
+	[key: string]: STYLE.CSSProperties | ITSS;
 }
 export function parse(tss: ITSS): string {
 	const parseTSS = (json: ITSS): string => {

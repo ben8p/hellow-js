@@ -3,7 +3,8 @@
 	"compilerOptions": {
 	},
 	"include": [
-		"**/*.tsx",
+		"./**/*.tsx",
+		"./**/*.ts",
 		"../src/**/*.tsx",
 		"../src/**/*.ts",
 	]

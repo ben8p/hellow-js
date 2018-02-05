@@ -1,4 +1,8 @@
-export function tsx(type: JSX.Element['type'], attributes: JSX.Element['attributes'], ...children: JSX.Element['children']): JSX.Element { // tslint:disable-line:no-reserved-keywords
+export function tsx(type: JSX.Element['type'], attributes: JSX.Element['attributes'], ...childNodes: JSX.Element['children']): JSX.Element { // tslint:disable-line:no-reserved-keywords
+	let children = childNodes;
+	if (children && children[0] instanceof Array) {
+		children = children[0] as any;
+	}
 	return { type, attributes, children };
 }
 
@@ -16,7 +20,11 @@ function updateAttributes(node: HTMLElement, newVirtualNode: JSX.Element, oldVir
 	const oldAttributes: JSX.Element['attributes'] = {};
 	Object.assign(oldAttributes, (oldVirtualNode && oldVirtualNode.attributes) || {});
 	Object.keys(newVirtualNode.attributes || {}).forEach((key) => {
-		node.setAttribute(key, newVirtualNode.attributes[key]);
+		if ((newVirtualNode.attributes[key] as any) !== false) {
+			node.setAttribute(key, newVirtualNode.attributes[key]);
+		} else {
+			node.removeAttribute(key);
+		}
 		delete oldAttributes[key];
 	});
 	Object.keys(oldAttributes).forEach((key) => {
@@ -33,7 +41,6 @@ function attributesHaveChanged(node1: JSX.Element, node2: JSX.Element): boolean 
 }
 
 const canUseWorker = 'Worker' in window && 'Blob' in window && 'URL' in window;
-let worker: Worker;
 
 export function render(parentNode: Node, currentVirtualNode: JSX.Element, previousVirtualNode: JSX.Element, useWorker: boolean = true): Worker {
 	const postMessage = (data: {[key: string]: any}, _transferList?: any) => {
@@ -104,19 +111,19 @@ export function render(parentNode: Node, currentVirtualNode: JSX.Element, previo
 		postMessage({
 			action: 'done',
 		});
+		close();
 	}
 
 	if (useWorker && canUseWorker) {
-		if (!worker) {
-			const blob = new Blob([`
-				${nodeHasChanged.toString()}
-				${attributesHaveChanged.toString()}
-				${renderWorker.toString()}
-				onmessage = ${onMessageReceivedByWorker.toString()}
-			`]);
-			const blobURL = URL.createObjectURL(blob);
-			worker = new Worker(blobURL);
-		}
+		const blob = new Blob([`
+			${nodeHasChanged.toString()}
+			${attributesHaveChanged.toString()}
+			${renderWorker.toString()}
+			onmessage = ${onMessageReceivedByWorker.toString()}
+		`]);
+		const blobURL = URL.createObjectURL(blob);
+		const worker: Worker = new Worker(blobURL);
+
 		worker.onmessage = (message: MessageEvent) => {
 			if (message.data.action === 'done') {
 				return;

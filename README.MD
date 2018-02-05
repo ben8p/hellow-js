@@ -20,6 +20,10 @@ Thanks [squarespace](https://logo.squarespace.com) for that outstanding logo!
  - Support for extending native elements via the `@component` decorator : `@component('my-component', {extends: 'div'})`
  - Support custom element styling via the `@component` decorator : `@component('my-component', {style: {div: { background: 'red' }}})`
 
+## FIXME
+- add tests
+- comment code
+
 ## component example
 ```ts
 @component('my-greetings', {
