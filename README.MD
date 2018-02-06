@@ -1,11 +1,12 @@
 # Hellow-JS
 ![Hellow-JS][logo]  
-Yet another WebComponent builder...  
+> _Yet another WebComponent builder..._  
+
 Featuring typescript, decorators and JSX  
 Thanks [awesome Javascript project names generator](https://mrsharpoblunto.github.io/foswig.js/) for that stunning name!  
 Thanks [squarespace](https://logo.squarespace.com) for that outstanding logo!  
 
-## features
+## Features
  - Declare custom elements using the `@component` decorator
  - Refresh the DOM when property decorated with `@state` changes
  - Listen to dom events using `@eventListener` decorator (support event delegation)
@@ -20,11 +21,13 @@ Thanks [squarespace](https://logo.squarespace.com) for that outstanding logo!
  - Support for extending native elements via the `@component` decorator : `@component('my-component', {extends: 'div'})`
  - Support custom element styling via the `@component` decorator : `@component('my-component', {style: {div: { background: 'red' }}})`
 
-## FIXME
-- add tests
-- fix demo to only have one demo in the bindle
+## See it in action
+Demos are available here : https://rawgit.com/ben8p/hellow-js/master/demo/index.html
 
-## component example
+## TODO
+- add tests
+
+## Component example
 ```ts
 @component('my-greetings', {
 	style: {
@@ -66,14 +69,14 @@ export class MyGreetings extends HTMLElement implements JSX.ElementClass {
 }
 ```
 
-## installation
+## Installation
 First you need to clone the repository, then use `yarn install` (or `npm install`) to install all dependencies.  
 
-## build the library
+## Build the library
 Run `yarn build-lib` (or `npm run build-lib`) to make a one shot build of the library  
 Run `yarn dev-lib` (or `npm run dev-lib`) to make an initial build of the library and keep watching for file changes.  
 
-## build the demos
+## Build the demos
 Run `yarn build-demo` (or `npm run build-demo`) to make a one shot build of the demos  
 Run `yarn dev-demo` (or `npm run dev-demo`) to make an initial build of the demos and keep watching for file changes.  
 Then open the file `./demo/index.html` into a browser (using `file://` protocol)  
