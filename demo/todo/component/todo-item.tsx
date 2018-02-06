@@ -1,4 +1,4 @@
-import { component, eventListener, tsx, attribute, ATTRIBUTE } from '../../lib';
+import { component, eventListener, tsx, attribute, ATTRIBUTE } from '../../../lib';
 import { style } from './todo-item.style';
 
 @component('todo-item', {

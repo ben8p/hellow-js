@@ -3,7 +3,7 @@ import 'document-register-element'; // tslint:disable-line:no-import-side-effect
 
 import { parse, ITSS } from '../tss';
 import { render } from '../tsx';
-import { addEventListenerOnce, EVENTS } from './_helpers';
+import { addEventListenerOnce, EVENTS, CONNECTION_STATE } from './_helpers';
 import { debounce } from '../..';
 
 interface IComponentOptions {
@@ -13,6 +13,7 @@ interface IComponentOptions {
 	style?: ITSS;
 }
 
+// create the shadow root and map all dom method/property to the main node
 function createShadowDom(targetClass: ICustomElement): void {
 	if (typeof targetClass.attachShadow === 'function' && !targetClass.shadowRoot) { // tslint:disable-line:no-unbound-method
 		targetClass.attachShadow({mode: 'open'});
@@ -53,13 +54,15 @@ function createShadowDom(targetClass: ICustomElement): void {
 	}
 }
 
+// this decorator is used to declare a custom element.
+// It wil configure it, register it and render its style
 export function component(name: string, options: IComponentOptions = {}): (targetClass: Constructor<ICustomElement>) => void {
 	return (targetClass: Constructor<ICustomElement>): void => {
 		if (!Object.getOwnPropertyDescriptor(targetClass.prototype, '__component__')) {
 			Object.defineProperty(targetClass.prototype, '__component__', {
 				value: {
 					debounceRender: null,
-					isConnected: false,
+					isConnected: CONNECTION_STATE.NEVER_CONNECTED,
 					isStyleAdded: false,
 					messagingHub: null,
 					previousRenderResult: null,
@@ -91,38 +94,40 @@ export function component(name: string, options: IComponentOptions = {}): (targe
 			if (!Object.getOwnPropertyDescriptor(this, '__component__')) {
 				Object.defineProperty(this, '__component__', {
 					value: {
-						debounceRender: null,
-						isConnected: true,
+						debounceRender: (this as ICustomElement).__component__.debounceRender = debounce(this.render.bind(this)),
+						isConnected: CONNECTION_STATE.CONNECTED_ONCE,
 						isStyleAdded: false,
 						messagingHub: document.createDocumentFragment(),
 						previousRenderResult: null,
 					},
 				});
+			} else {
+				(this as ICustomElement).__component__.isConnected = CONNECTION_STATE.CONNECTED_MULTIPLE;
 			}
 
-			if (options.useShadowDom !== false) {
-				createShadowDom(this);
-			}
-
-			addEventListenerOnce(this, EVENTS.DONE_RENDERING, () => {
-				(this as ICustomElement).__component__.debounceRender = debounce(this.render.bind(this));
-
-				if (options.style && !(this as ICustomElement).__component__.isStyleAdded) {
-					(this as ICustomElement).__component__.isStyleAdded = true;
-					const namespace: ITSS = {};
-					namespace[this.shadowRoot ? ':host' : name] = options.style;
-					const css = parse(namespace);
-					const cssBlob = new Blob([css], {type : 'text/css'});
-					const cssURL = URL.createObjectURL(cssBlob);
-					const link = document.createElement('link');
-					link.setAttribute('rel', 'stylesheet');
-					link.setAttribute('type', 'text/css');
-					link.setAttribute('href', cssURL);
-					this.appendChild(link);
+			if ((this as ICustomElement).__component__.isConnected === CONNECTION_STATE.CONNECTED_ONCE) {
+				if (options.useShadowDom !== false) {
+					createShadowDom(this);
 				}
-			});
 
-			this.render();
+				addEventListenerOnce(this, EVENTS.DONE_RENDERING, () => {
+					if (options.style && !(this as ICustomElement).__component__.isStyleAdded) {
+						(this as ICustomElement).__component__.isStyleAdded = true;
+						const namespace: ITSS = {};
+						namespace[this.shadowRoot ? ':host' : name] = options.style;
+						const css = parse(namespace);
+						const cssBlob = new Blob([css], {type : 'text/css'});
+						const cssURL = URL.createObjectURL(cssBlob);
+						const link = document.createElement('link');
+						link.setAttribute('rel', 'stylesheet');
+						link.setAttribute('type', 'text/css');
+						link.setAttribute('href', cssURL);
+						this.appendChild(link);
+					}
+				});
+
+				this.render();
+			}
 
 			if (originalConnectedCallback) {
 				originalConnectedCallback.apply(this);
@@ -131,7 +136,7 @@ export function component(name: string, options: IComponentOptions = {}): (targe
 
 		const originalDisconnectedCallback = targetClass.prototype.disconnectedCallback;
 		targetClass.prototype.disconnectedCallback = function(): void {
-			(this as ICustomElement).__component__.isConnected = false;
+			(this as ICustomElement).__component__.isConnected = CONNECTION_STATE.NOT_CONNECTED;
 			if (originalDisconnectedCallback) {
 				originalDisconnectedCallback.apply(this);
 			}

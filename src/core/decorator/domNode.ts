@@ -1,5 +1,7 @@
 import { addEventListenerOnce, EVENTS } from './_helpers';
 
+// this decorator is used to reference a dom node inside your code.
+// It will execute the querySelector and attach any result provided
 export function domNode(cssSelector: string): DecoratorFactory<ICustomElement> {
 	return (targetPrototype: ICustomElement, propertyKey: string): void => {
 		if (!Object.getOwnPropertyDescriptor(targetPrototype, '__domNodes__')) {

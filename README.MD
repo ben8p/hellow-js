@@ -22,7 +22,7 @@ Thanks [squarespace](https://logo.squarespace.com) for that outstanding logo!
 
 ## FIXME
 - add tests
-- comment code
+- fix demo to only have one demo in the bindle
 
 ## component example
 ```ts

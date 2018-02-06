@@ -1,4 +1,4 @@
-import { component, eventListener, tsx, domNode } from '../../lib';
+import { component, eventListener, tsx, domNode } from '../../../lib';
 import { style } from './todo-input.style';
 @component('todo-input', {
 	style,
@@ -11,7 +11,6 @@ export class TodoInput extends HTMLElement {
 	public onInputBlur(event: Event): void {
 		event.stopPropagation();
 		event.preventDefault();
-
 		if (!this.inputNode.value) {
 			return;
 		}

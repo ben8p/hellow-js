@@ -1,11 +1,14 @@
 // tslint:disable:variable-name
-import { ATTRIBUTE, getAttribute, setAttribute } from './_helpers';
+import { ATTRIBUTE, getAttribute, setAttribute, CONNECTION_STATE } from './_helpers';
 import { attributeListener } from './attributeListener';
 
 interface IAttributeOptions {
 	state?: boolean;
 }
 
+// this decorator is used to declare a class member as a dom property.
+// When used, the value won;t be store locally. It will instead come from get/setAttribute
+// Attributes can be configured as state. In this case, any changes will trigger a render
 export function attribute(attributeType: ATTRIBUTE, options: IAttributeOptions = {}): DecoratorFactory<ICustomElement> {
 	return (targetPrototype: ICustomElement, propertyKey: string): void => {
 		if (!Object.getOwnPropertyDescriptor(targetPrototype, '__attributes__')) {
@@ -36,7 +39,7 @@ export function attribute(attributeType: ATTRIBUTE, options: IAttributeOptions =
 					return getAttribute(this, propertyKey, attributeType);
 				},
 				set(newValue: any): void { // tslint:disable-line:no-reserved-keywords
-					if ((this as ICustomElement).__component__.isConnected) {
+					if ((this as ICustomElement).__component__.isConnected === CONNECTION_STATE.CONNECTED_MULTIPLE || (this as ICustomElement).__component__.isConnected === CONNECTION_STATE.CONNECTED_ONCE) {
 						setAttribute(this, propertyKey, newValue, attributeType);
 					}
 				},

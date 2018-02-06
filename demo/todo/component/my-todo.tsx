@@ -1,4 +1,4 @@
-import { component, eventListener, state, tsx } from '../../lib';
+import { component, eventListener, state, tsx } from '../../../lib';
 import { style } from './my-todo.style';
 interface ITodoItem {
 	text: string;

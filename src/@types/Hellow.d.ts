@@ -1,10 +1,11 @@
 interface ICustomElement extends HTMLElement {
 	__attributes__?: {[key: string]: number};
 	__attributeListeners__?: {[key: string]: string};
+	__attributeListenersPending__?: {[key: string]: {newValue: string; oldValue: string}};
 	__eventListeners__?: {[key: string]: string};
 	__domNodes__?: {[key: string]: string};
 	__component__?: {
-		isConnected?: boolean;
+		isConnected?: number;
 		messagingHub?: DocumentFragment;
 		previousRenderResult?: JSX.Element;
 		isStyleAdded?: boolean;

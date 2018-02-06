@@ -16,10 +16,10 @@ function formatAmount(amount: string): string {
 })
 export class MyCurrency extends HTMLElement implements JSX.ElementClass {
 	@state()
-	private currentCurrency: string;
+	private currentCurrency: string = '';
 
 	@state()
-	private currentAmount: string;
+	private currentAmount: string = '';
 
 	public render(): JSX.Element {
 		return (<span>

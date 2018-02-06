@@ -2,6 +2,7 @@ export interface ITSS {
 	[key: string]: STYLE.CSSProperties | ITSS;
 }
 export function parse(tss: ITSS): string {
+	// recursively parse some json and convert it into real CSS
 	const parseTSS = (json: ITSS): string => {
 		const selectors = Object.keys(json);
 		return selectors.map((selector) => {

@@ -5,16 +5,18 @@
 	"main": "./lib/index.js",
 	"types": "./lib/index.d.ts",
 	"scripts": {
-		"build-lib": "./node_modules/.bin/tsc -p ./tsconfig.json",
-		"build-demo": "./node_modules/.bin/browserify demo/**/*.tsx -p [ tsify ] -o demo/build/demo.js",
-		"dev-lib": "./node_modules/.bin/tsc -p ./tsconfig.json -w",
-		"dev-demo": "./node_modules/.bin/watchify demo/**/*.tsx -p [ tsify ] -o demo/build/demo.js -v"
+		"build-lib": "./cli/hellow build",
+		"build-demo": "./cli/hellow demo",
+		"dev-lib": "./cli/hellow build",
+		"dev-demo": "./cli/hellow demo -w"
 	},
 	"author": "Benjamin Santalucia",
 	"license": "ISC",
 	"dependencies": {},
 	"devDependencies": {
 		"browserify": "^15.2.0",
+		"chalk": "^2.3.0",
+		"commander": "^2.14.0",
 		"document-register-element": "^1.7.2",
 		"tsify": "^3.0.4",
 		"tslib": "^1.9.0",
