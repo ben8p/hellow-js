@@ -73,13 +73,13 @@ export class MyGreetings extends HTMLElement implements JSX.ElementClass {
 First you need to clone the repository, then use `yarn install` (or `npm install`) to install all dependencies.  
 
 ## Build the library
-Run `yarn build-lib` (or `npm run build-lib`) to make a one shot build of the library  
-Run `yarn dev-lib` (or `npm run dev-lib`) to make an initial build of the library and keep watching for file changes.  
+Run `yarn build-lib` (or `npm run build:lib`) to make a one shot build of the library  
+Run `yarn dev-lib` (or `npm run dev:lib`) to make an initial build of the library and keep watching for file changes.  
 
 ## Build the demos
-Run `yarn build-demo` (or `npm run build-demo`) to make a one shot build of the demos  
-Run `yarn dev-demo` (or `npm run dev-demo`) to make an initial build of the demos and keep watching for file changes.  
-Then open the file `./demo/index.html` into a browser (using `file://` protocol)  
+Run `yarn build-demo` (or `npm run build:demo`) to make a one shot build of the demos  
+Run `yarn dev-demo` (or `npm run dev:demo`) to make an initial build of the demos and keep watching for file changes.  
+Run `yarn demo` (or `npm run demo`) to start the demo server. Then navigate to http://127.0.0.1:5555
 
 
 [logo]: https://raw.githubusercontent.com/ben8p/hellow-js/master/Hellow-JS.png "Hellow-JS"

@@ -5,8 +5,7 @@ export function debounce(method: Function, delay: number = 4): (...kwArgs: any[]
 		if (timeoutHandle) {
 			clearTimeout(timeoutHandle);
 		}
-
-		timeoutHandle = setTimeout(() => {
+		timeoutHandle = window.setTimeout(() => {
 			method(...kwArgs);
 		}, delay);
 	};

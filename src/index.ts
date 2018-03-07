@@ -7,3 +7,5 @@ export { state } from './core/decorator/state';
 export { ATTRIBUTE } from './core/decorator/_helpers';
 export { tsx } from './core/tsx';
 export { debounce } from './core/debounce';
+
+export { Router } from './router/router';

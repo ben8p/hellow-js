@@ -31,3 +31,8 @@ interface ICustomElementConstructor extends Function {
 type DecoratorFactory<T> = (targetPrototype: T, propertyKey: string) => void;
 
 type Constructor<T> = new (...args: any[]) => T;
+
+declare module '*.html' {
+	const value: string;
+	export default value;
+}

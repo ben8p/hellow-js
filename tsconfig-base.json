@@ -24,6 +24,8 @@
 		"removeComments": false,
 		"traceResolution": false,
 		"preserveConstEnums": true,
+		"esModuleInterop": true,
+		"pretty": true,
 		"lib": [
 			"es2015",
 			"es2017",
@@ -35,8 +37,7 @@
 			}
 		]
 	},
-	"include": [
-		"src/**/*.ts",
-		"src/**/*.tsx"
+	"exclude": [
+		"src/**/*.spec.ts"
 	]
 }
